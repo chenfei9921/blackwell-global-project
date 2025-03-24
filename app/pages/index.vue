@@ -228,6 +228,35 @@
           <button class="btn-register-color text-xl font-bold text-white px-6 py-3 rounded-lg">Register Now</button>
         </div>
       </div>
+      <div class="text-center lg:text-center mt-10">
+        <h2 class="text-4xl font-semibold text-light-blue mb-6">Navigate Our App in 5 Clicks</h2>
+      </div>
+      <div class="relative flex flex-col items-center text-white justify-center">
+        <!-- Content Section 包裹 Tabs -->
+        <div class="w-full max-w-4xl bg-yellow-200 mt-[5rem] p-6 rounded-lg shadow-lg text-black relative">
+          <!-- Tabs 直接放进黄色区域 -->
+          <div class="absolute -top-[2.7rem] left-0 w-1/2 flex justify-around rounded-t-lg bg-white">
+            <button v-for="(tab, index) in tabs" :key="index"
+                    @click="activeTab = index"
+                    class="flex-1 flex justify-center p-2 transition-all duration-200"
+                    :class="activeTab === index ? 'bg-yellow-200 rounded-t-lg shadow' : ''">
+              <img :src="activeTab === index ? tab.activeIcon : tab.inactiveIcon" class="w-8 h-8" />
+            </button>
+          </div>
+
+          <!-- Content Section -->
+          <div class="flex flex-col md:flex-row items-center md:items-start justify-between bg-yellow-200 p-6 rounded-b-lg">
+            <div class="md:w-1/2 mt-10">
+              <h2 class="text-lg font-bold text-blue-900">{{ tabs[activeTab].title }}</h2>
+              <p class="text-sm mt-2 font-normal">{{ tabs[activeTab].description }}</p>
+            </div>
+            
+            <div class="md:w-1/2 mt-4 md:mt-0 flex justify-center">
+              <img v-if="tabs[activeTab].image" :src="tabs[activeTab].image" class="w-full max-w-xs rounded-lg shadow-md" />
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="trade-pro-section1">
         <div class="text-center lg:text-center pt-[11rem]">
           <h2 class="text-4xl font-semibold text-light-blue mb-6">Enquire Now</h2>
@@ -240,11 +269,11 @@
                 <input type="email" placeholder="Email" class="input-field" />
                 <input type="tel" placeholder="Mobile No." class="input-field" />
                 <select v-model="selectedCountry" class="input-field">
-          <option value="">Select your country</option>
-          <option v-for="country in countries" :key="country.code" :value="country.code">
-            {{ country.flag }} {{ country.name }}
-          </option>
-        </select>
+                  <option value="">Select your country</option>
+                  <option v-for="country in countries" :key="country.code" :value="country.code">
+                    {{ country.flag }} {{ country.name }}
+                  </option>
+                </select>
               </div>
               <textarea placeholder="Enter your message here" class="input-field h-32"></textarea>
               <button class="btn-register-color text-xl font-bold text-white px-6 py-3 rounded-lg">Submit</button>
@@ -255,119 +284,155 @@
     </section>
   </main>
 </template>
-<script>
-export default {
-  data() {
-    return {
-      activeStep: 0,
-      countries: [],
-      selectedCountry: "",
-      isLoggedIn: false, 
-      steps: [
-        { 
-          title: 'Install our app, “Blackwell Invest”', 
-          image: '/guide-1.png'
-        },
-        { 
-          title: 'Choose a signal Master and click “Copy”', 
-          image: '/guide-2.png'
-        },
-        { 
-          title: 'Set your trade size preferences', 
-          image: '/guide-3.png'
-        },
-        { 
-          title: 'Click “Agree and Copy”', 
-          image: '/guide-4.png'
-        }
-      ],
-      linkStep: 0,
-      isDesktop: false,
-      link: [
-        { content: ' Select “BlackwellGlobalAsia-Live” server', image: '/step-1.png' },
-        { content: 'Fill in your Blackwell Global trading account OR create a new account', image: '/step-2.png' },
-        { content: 'Click “Copy Trades', image: '/step-3.png' },
-        { content: 'Click “Agree and Copy', image: '/step-4.png' },
-        { content: 'Confirm the trade settings', image: '/step-5.png' },
-        { content: 'Ensure sufficient balance in your account', image: '/step-6.png' },
-        { content: 'Monitor your trade performance', image: '/step-7.png' },
-        { content: 'Enjoy successful copy trading!', image: '/step-8.png' }
-      ],
-      items: [
-        {
-          icon: '/icon-1.png',
-          title: 'Regulated',
-          description: 'The copy trading platform is regulated. Our technology partner is regulated. And so are we, as a brokerage. We operate under strict comliance for your peace of mind.'
-        },
-        {
-          icon: '/icon-2.png',
-          title: '0 Commissions',
-          description: 'When investing, the small margins matter. Blackwell Invest offers 0 commissions investing, and 0 cost to install our app.'
-        },
-        {
-          icon: '/icon-3.png',
-          title: 'User friendly',
-          description: 'With an intuitive interface, easy trade execution, and hassle-free management, copying top traders has never been simpier. Trade smarter, not harder!'
-        },
-        {
-          icon: '/icon-4.png',
-          title: 'Tier 1 liquidity',
-          description: 'Blackwell Invest sources the best liquidity to provide a deep product range and broad market access. Fast order execution and transparent pricing.'
-        }
-      ]
-    };
-  },
-  watch: {
-    isDesktop(newValue) {
-      this.linkStep = 0;
-    }
-  },
-  computed: {
-    stepCount() {
-      return this.isDesktop ? 3 : 1;
-    },
-    visibleSteps() {
-      return this.link.slice(this.linkStep, this.linkStep + this.stepCount);
-    }
-  },
-  methods: {
-    prevStep() {
-      if (this.linkStep > 0) this.linkStep--;
-    },
-    nextStep() {
-      if (this.linkStep < this.link.length - this.stepCount) this.linkStep++;
-    },
-    updateIsDesktop() {
-      this.isDesktop = window.innerWidth >= 1024;
-    }
-  },
-  async mounted() {
-    this.updateIsDesktop();
-    window.addEventListener("resize", this.updateIsDesktop);
-    const storedUser = JSON.parse(localStorage.getItem("registeredUser") || "{}");
-    this.isLoggedIn = !!storedUser.accessToken;
-    try {
-      const response = await fetch("https://restcountries.com/v3.1/all");
-      const data = await response.json();
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 
-      this.countries = data.map((country) => ({
-        name: country.name.common,
-        code: country.cca2,
-        dial_code: country.idd?.root
-          ? country.idd.root + (country.idd.suffixes?.[0] || "")
-          : "",
-        flag: country.flag || "",
-      }));
-    } catch (error) {
-      console.error("Failed to load countries:", error);
-    }
+// 响应式状态
+const activeStep = ref(0);
+const countries = ref([]);
+const selectedCountry = ref("");
+const isLoggedIn = ref(false);
+const linkStep = ref(0);
+const isDesktop = ref(false);
+const activeTab = ref(1);
 
+const steps = [
+  { title: "Install our app, “Blackwell Invest”", image: "/guide-1.png" },
+  { title: "Choose a signal Master and click “Copy”", image: "/guide-2.png" },
+  { title: "Set your trade size preferences", image: "/guide-3.png" },
+  { title: "Click “Agree and Copy”", image: "/guide-4.png" }
+];
+
+const link = [
+  { content: "Select “BlackwellGlobalAsia-Live” server", image: "/step-1.png" },
+  { content: "Fill in your Blackwell Global trading account OR create a new account", image: "/step-2.png" },
+  { content: "Click “Copy Trades", image: "/step-3.png" },
+  { content: "Click “Agree and Copy", image: "/step-4.png" },
+  { content: "Confirm the trade settings", image: "/step-5.png" },
+  { content: "Ensure sufficient balance in your account", image: "/step-6.png" },
+  { content: "Monitor your trade performance", image: "/step-7.png" },
+  { content: "Enjoy successful copy trading!", image: "/step-8.png" }
+];
+
+const items = [
+  {
+    icon: "/icon-1.png",
+    title: "Regulated",
+    description:
+      "The copy trading platform is regulated. Our technology partner is regulated. And so are we, as a brokerage. We operate under strict compliance for your peace of mind."
   },
-  beforeDestroy() {
-    window.removeEventListener("resize", this.updateIsDesktop);
+  {
+    icon: "/icon-2.png",
+    title: "0 Commissions",
+    description:
+      "When investing, the small margins matter. Blackwell Invest offers 0 commissions investing, and 0 cost to install our app."
+  },
+  {
+    icon: "/icon-3.png",
+    title: "User friendly",
+    description:
+      "With an intuitive interface, easy trade execution, and hassle-free management, copying top traders has never been simpler. Trade smarter, not harder!"
+  },
+  {
+    icon: "/icon-4.png",
+    title: "Tier 1 liquidity",
+    description:
+      "Blackwell Invest sources the best liquidity to provide a deep product range and broad market access. Fast order execution and transparent pricing."
   }
+];
+
+const tabs = [
+  {
+    title: "Discover",
+    description: "Explore new opportunities and insights in the market.",
+    activeIcon: "/icon1.png",
+    inactiveIcon: "/icon1-blue.png",
+    image: "/reason-1.png"
+  },
+  {
+    title: "Activity",
+    description: "See the past trades made by the signals you are copying from the last 30 days or track their open positions.",
+    activeIcon: "/icon2.png",
+    inactiveIcon: "/icon2-blue.png",
+    image: "/reason-2.png"
+  },
+  {
+    title: "Trade",
+    description: "Execute your trading strategies with precision and ease.",
+    activeIcon: "/icon3.png",
+    inactiveIcon: "/icon3-blue.png",
+    image: "/reason-3.png"
+  },
+  {
+    title: "Positions",
+    description: "Monitor your ongoing and closed trades in one place.",
+    activeIcon: "/icon4.png",
+    inactiveIcon: "/icon4-blue.png",
+    image: "/reason-4.png"
+  },
+  {
+    title: "Account",
+    description: "Manage your profile and trading settings with ease.",
+    activeIcon: "/icon5.png",
+    inactiveIcon: "/icon5-blue.png",
+    image: "/reason-5.png"
+  }
+];
+
+// 计算属性
+const stepCount = computed(() => (isDesktop.value ? 3 : 1));
+const visibleSteps = computed(() => link.slice(linkStep.value, linkStep.value + stepCount.value));
+
+// 方法
+const prevStep = () => {
+  if (linkStep.value > 0) linkStep.value--;
 };
+
+const nextStep = () => {
+  if (linkStep.value < link.length - stepCount.value) linkStep.value++;
+};
+
+const updateIsDesktop = () => {
+  isDesktop.value = window.innerWidth >= 1024;
+};
+
+// 监听 isDesktop 变化
+watch(isDesktop, () => {
+  linkStep.value = 0;
+});
+
+// 生命周期
+onMounted(async () => {
+  updateIsDesktop();
+  window.addEventListener("resize", updateIsDesktop);
+
+  // 获取本地存储用户数据
+  const storedUser = JSON.parse(localStorage.getItem("registeredUser") || "{}");
+  isLoggedIn.value = !!storedUser.accessToken;
+
+  // 获取国家数据
+  try {
+    const response = await fetch("https://restcountries.com/v3.1/all");
+    const data = await response.json();
+
+    countries.value = data.map((country) => ({
+      name: country.name.common,
+      code: country.cca2,
+      dial_code: country.idd?.root
+        ? country.idd.root + (country.idd.suffixes?.[0] || "")
+        : "",
+      flag: country.flag || ""
+    }));
+  } catch (error) {
+    console.error("Failed to load countries:", error);
+  }
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", updateIsDesktop);
+});
 </script>
+
 
 <style lang="css" scoped>
 .regular {
@@ -485,6 +550,9 @@ export default {
   background-size: cover;
   background-position: top -50px;
   background-repeat: no-repeat;
+}
+button:focus {
+  outline: none;
 }
 @media screen and (min-width: 1025px) {
   .margin-l-web{
