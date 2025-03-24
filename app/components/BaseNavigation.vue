@@ -105,10 +105,10 @@ const isLoggedIn = ref(false);
 const showLoginModal = ref(false);
 const showRegisterModal = ref(false);
 
-const days = ref(27);
-const hours = ref(23);
-const minutes = ref(45);
-const seconds = ref(7);
+const days = ref(30);
+const hours = ref(30);
+const minutes = ref(30);
+const seconds = ref(30);
 
 const countdown = () => {
 const interval = setInterval(() => {
